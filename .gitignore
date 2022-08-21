@@ -5,3 +5,4 @@ example_session.txt
 nohup.out
 tmp.txt
 config.json
+__pycache__
