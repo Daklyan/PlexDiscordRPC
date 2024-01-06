@@ -8,3 +8,4 @@ host = config['host'] # host and port of tautulli (include base URL for reverse 
 username = config['username'] # if blank, any user will be reported on your profile
 client_id = config['client_id']
 libraries = config['libraries'] # set this to [] if you want to use any library
+excluded_devices = config['excluded_devices']
