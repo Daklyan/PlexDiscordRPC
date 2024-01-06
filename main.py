@@ -1,23 +1,32 @@
 import traceback
-
 import tautulli
 import config
 import time
+import calendar
+import subprocess
+
 from config import client_id
 from pypresence import Presence
+from pypresence.exceptions import PyPresenceException
 from datetime import datetime
 
 RPC = Presence(client_id)
 
 
 def main():
-    RPC.connect()
+    try:
+        RPC.connect()
+    except Exception:
+        print("launching discord")
+        subprocess.Popen("discord")
+        time.sleep(30)
+        RPC.connect()
     old_activity = {}
     playing_or_not = ""
     while True:
         try:
-            now = datetime.now()
-            time_str = now.strftime("%d/%m/%Y %Hh%Mm%Ss")
+            now = calendar.timegm(time.gmtime())# datetime.now()
+            time_str = datetime.now().strftime("%d/%m/%Y %Hh%Mm%Ss")
             current_activity = tautulli.get_my_activity()
             if current_activity is not None:
 				# Shows
@@ -32,7 +41,7 @@ def main():
                     to_send['large_image'] = "movie"
                 # Musics
                 elif current_activity['media_type'] == "track":
-                    artists = current_activity['original_title'] if current_activity['original_title'] else current_activity['parent_title']
+                    artists = current_activity['original_title'] if current_activity['original_title'] else current_activity['grandparent_title']
                     if len(current_activity['title']) > 25:
                         to_send = dict(
                             state=current_activity['title'][:25] + "... ー " + artists)
@@ -52,7 +61,7 @@ def main():
                 if current_activity['state'] == "playing":
                     # playing_or_not = "▶ "
                     to_send['small_image'] = "play"
-                    current_progress = (int(current_activity['duration']) * int(current_activity['progress_percent']) / 100) / 1000
+                    current_progress = ((int(current_activity['duration']) * int(current_activity['progress_percent'])) / 100) / 1000
                     to_send['small_text'] = "Playing"
                     to_send['end'] = time.time() + (int(current_activity['duration']) / 1000) - int(current_progress)
                 elif current_activity['state'] == "paused":
@@ -70,10 +79,19 @@ def main():
                 print(time_str + " - Currently playing : " + current_activity['parent_title'] + " - " + current_activity['title'])
             else:
                 RPC.clear()
-        except Exception:
-            print("Error here")
+        except PyPresenceException as e:
+            print("DISCORD ERROR : " + str(e))
+            print("launching discord")
+            subprocess.Popen("discord")
+            time.sleep(30)
+            RPC.connect()
+        except Exception as e:
+            if hasattr(e, 'message'):
+            	print(e.message + "; " + current_activity)
+            else:
+            	print(e)
             error_file = open("error_log.txt", "a")
-            error_file.write(time_str + " - ERROR\n")
+            error_file.write(time_str + " - ERROR : "+ str(e) + "\n")
             error_file.close()
             
         time.sleep(15)  # rich presence is limited to once per 15 seconds
