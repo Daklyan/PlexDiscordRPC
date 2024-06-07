@@ -1,8 +1,4 @@
-error_log.txt
-log.txt
-run_in_background
-example_session.txt
-nohup.out
-tmp.txt
+*.log
+*.txt
 config.json
 __pycache__
