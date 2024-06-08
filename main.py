@@ -24,7 +24,8 @@ logging.basicConfig(
 def main():
     try:
         RPC.connect()
-    except Exception:
+    except PyPresenceException as error:
+        LOGGER.error(f"Encountered a discord error : {error}")
         LOGGER.info("Launching discord")
         subprocess.Popen("discord")
         time.sleep(30)
@@ -52,12 +53,6 @@ def main():
                 RPC.update(**to_send)
             else:
                 RPC.clear()
-        except PyPresenceException as error:
-            LOGGER.error(f"Encountered a discord error : {error}")
-            LOGGER.info("Launching discord")
-            subprocess.Popen("discord")
-            time.sleep(30)
-            RPC.connect()
         except Exception as error:
             LOGGER.error(f"Encountered an error : {error}")
 
