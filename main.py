@@ -41,8 +41,7 @@ def main():
                     to_send["details"] = current_activity["grandparent_title"]
 
                 LOGGER.info(
-                    "Playing"
-                    + current_activity["state"]
+                    current_activity["state"].capitalize()
                     + " - "
                     + current_activity["grandparent_title"]
                     + " - "
