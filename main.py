@@ -93,7 +93,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         else:
             to_send = dict(state=current_activity["title"] + " ー " + artists)
         to_send["large_image"] = "music"
-        to_send["details"] = current_activity["parent_title"]
+        to_send["details"] = "{:<2}".format(current_activity["parent_title"])
     # Others
     else:
         to_send = dict(state=current_activity["title"] + " ー " + artists)
