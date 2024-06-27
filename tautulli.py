@@ -16,6 +16,7 @@ def get_activity(host=host, apikey=apikey):
 
 def get_my_activity(host=host, apikey=apikey, username=username, libraries=libraries):
     data = get_activity(host=host, apikey=apikey)['response']['data']
+    # print(data)
     for stream in data['sessions']:
         if (len(libraries) == 0 or stream['library_name'] in libraries) and (username == "" or stream['user'] == username) and stream['device'] not in excluded_devices:
             # print(json.dumps(stream, indent=4))

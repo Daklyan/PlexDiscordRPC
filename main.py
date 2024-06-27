@@ -79,7 +79,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
     # Movies
     elif current_activity["media_type"] == "movie":
         to_send = dict(details=current_activity["title"])
-        to_send["state"] = "(" + current_activity["year"] + ")"
+        to_send["state"] = f"({current_activity['year']})"
         to_send["large_image"] = "movie"
     # Musics
     elif current_activity["media_type"] == "track":
@@ -89,14 +89,14 @@ def get_corresponding_infos(current_activity: dict) -> dict:
             else current_activity["grandparent_title"]
         )
         if len(current_activity["title"]) > 25:
-            to_send = dict(state=current_activity["title"][:25] + "... ー " + artists)
+            to_send = dict(state=f"{current_activity['title'][:25]}... ー {artists}")
         else:
-            to_send = dict(state=current_activity["title"] + " ー " + artists)
+            to_send = dict(state=f"{current_activity['title']} ー {artists}")
         to_send["large_image"] = "music"
         to_send["details"] = "{:<2}".format(current_activity["parent_title"])
     # Others
     else:
-        to_send = dict(state=current_activity["title"] + " ー " + artists)
+        to_send = dict(state=f"{current_activity['title']} ー {artists}")
         to_send["large_image"] = "plex"
 
     to_send["large_text"] = current_activity["title"][:50]
@@ -118,11 +118,8 @@ def set_progression(current_activity: dict, to_send: dict) -> dict:
     if current_activity["state"] == "playing":
         to_send["small_image"] = "play"
         current_progress = (
-            (
-                int(current_activity["duration"])
-                * int(current_activity["progress_percent"])
-            )
-            / 100
+            int(current_activity["duration"])
+            * (int(current_activity["progress_percent"]) / 100)
         ) / 1000
         to_send["small_text"] = "Playing"
         to_send["end"] = (
