@@ -96,7 +96,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         to_send["details"] = "{:<2}".format(current_activity["parent_title"])
     # Others
     else:
-        to_send = dict(state=f"{current_activity['title']} ー {artists}")
+        to_send = dict(state=current_activity['title'])
         to_send["large_image"] = "plex"
 
     to_send["large_text"] = current_activity["title"][:50]
@@ -116,17 +116,11 @@ def set_progression(current_activity: dict, to_send: dict) -> dict:
         dict: Updated to_send dict with the media progression
     """
     if current_activity["state"] == "playing":
+        duration = current_activity["duration"] / 1000
         to_send["small_image"] = "play"
-        current_progress = (
-            int(current_activity["duration"])
-            * (int(current_activity["progress_percent"]) / 100)
-        ) / 1000
+        current_progress = duration * current_activity["progress_percent"] / 100
         to_send["small_text"] = "Playing"
-        to_send["end"] = (
-            time.time()
-            + (int(current_activity["duration"]) / 1000)
-            - int(current_progress)
-        )
+        to_send["end"] = time.time() + duration - current_progress
     elif current_activity["state"] == "paused":
         to_send["small_image"] = "pause"
         to_send["small_text"] = "Paused"
@@ -135,3 +129,4 @@ def set_progression(current_activity: dict, to_send: dict) -> dict:
 
 if __name__ == "__main__":
     main()
+
