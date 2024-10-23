@@ -119,12 +119,15 @@ def set_progression(current_activity: dict, to_send: dict) -> dict:
         dict: Updated to_send dict with the media progression
     """
     if current_activity["state"] == "playing":
-        duration = int(current_activity["duration"]) / 1000
+        duration = round(float(current_activity["duration"]) / 1000)
         to_send["small_image"] = "play"
-        current_progress = duration * int(current_activity["progress_percent"]) / 100
+        current_progress = round(
+            duration * (float(current_activity["progress_percent"]) / 100)
+        )
         to_send["small_text"] = "Playing"
-        to_send["start"] = int(time.time() - current_progress)
-        to_send["end"] = int(time.time() + (duration - current_progress))
+        current_time = int(time.time())
+        to_send["start"] = current_time - current_progress
+        to_send["end"] = current_time + (duration - current_progress)
     elif current_activity["state"] == "paused":
         to_send["small_image"] = "pause"
         to_send["small_text"] = "Paused"
