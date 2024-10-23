@@ -4,6 +4,8 @@ import subprocess
 import tautulli
 
 from config import client_id
+# from pypresence import Presence
+# from pypresence import PyPresenceException
 from patchedPypresence.presence import Presence
 from patchedPypresence.exceptions import PyPresenceException
 
@@ -123,7 +125,8 @@ def set_progression(current_activity: dict, to_send: dict) -> dict:
         to_send["small_image"] = "play"
         current_progress = duration * int(current_activity["progress_percent"]) / 100
         to_send["small_text"] = "Playing"
-        to_send["end"] = int(round(time.time() * 1000) + duration - current_progress)
+        to_send["start"] = int(time.time() - current_progress)
+        to_send["end"] = int(time.time() + (duration - current_progress))
     elif current_activity["state"] == "paused":
         to_send["small_image"] = "pause"
         to_send["small_text"] = "Paused"
