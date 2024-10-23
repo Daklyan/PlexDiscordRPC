@@ -4,6 +4,7 @@ import subprocess
 import tautulli
 
 from config import client_id
+
 # from pypresence import Presence
 # from pypresence import PyPresenceException
 from patchedPypresence.presence import Presence
@@ -92,16 +93,13 @@ def get_corresponding_infos(current_activity: dict) -> dict:
             if current_activity["original_title"]
             else current_activity["grandparent_title"]
         )
-        if len(current_activity["title"]) > 25:
-            to_send = dict(state=f"{current_activity['title'][:25]}... ー {artists}")
-        else:
-            to_send = dict(state=f"{current_activity['title']} ー {artists}")
+        to_send = dict(state=artists)
         to_send["large_image"] = "music"
         to_send["details"] = "{:<2}".format(current_activity["parent_title"])
         to_send["activity_type"] = 2
     # Others
     else:
-        to_send = dict(state=current_activity['title'])
+        to_send = dict(state=current_activity["title"])
         to_send["large_image"] = "plex"
 
     to_send["large_text"] = current_activity["title"][:50]
