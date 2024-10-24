@@ -40,8 +40,9 @@ def main():
             current_activity = tautulli.get_my_activity()
             if current_activity is not None:
                 if (
-                    precedent_activity.get("file") == current_activity.get("file")
-                    and precedent_activity.get("state") == current_activity.get("state")
+                    precedent_activity
+                    and precedent_activity["file"] == current_activity["file"]
+                    and precedent_activity["state"] == current_activity["state"]
                 ):
                     # This works but need to improve in case the user scrubs through media
                     pass
