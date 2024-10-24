@@ -33,33 +33,43 @@ def main():
         subprocess.Popen("discord")
         time.sleep(30)
         RPC.connect()
+    precedent_activity = {}
+    to_send = {}
     while True:
         try:
             current_activity = tautulli.get_my_activity()
             if current_activity is not None:
-                to_send = get_corresponding_infos(current_activity=current_activity)
                 if (
-                    current_activity["grandparent_title"] != ""
-                    and not current_activity["media_type"] == "track"
+                    precedent_activity.get("file") == current_activity.get("file")
+                    and precedent_activity.get("state") == current_activity.get("state")
                 ):
-                    to_send["details"] = current_activity["grandparent_title"]
+                    # This works but need to improve in case the user scrubs through media
+                    pass
+                else:
+                    to_send = get_corresponding_infos(current_activity=current_activity)
+                    if (
+                        current_activity["grandparent_title"] != ""
+                        and not current_activity["media_type"] == "track"
+                    ):
+                        to_send["details"] = current_activity["grandparent_title"]
 
-                LOGGER.info(
-                    current_activity["state"].capitalize()
-                    + " - "
-                    + current_activity["grandparent_title"]
-                    + " - "
-                    + current_activity["parent_title"]
-                    + " - "
-                    + current_activity["title"]
-                )
-                RPC.update(**to_send)
+                    LOGGER.info(
+                        current_activity["state"].capitalize()
+                        + " - "
+                        + current_activity["grandparent_title"]
+                        + " - "
+                        + current_activity["parent_title"]
+                        + " - "
+                        + current_activity["title"]
+                    )
+                    RPC.update(**to_send)
+                    time.sleep(15)  # rich presence is limited to once per 15 seconds
             else:
                 RPC.clear()
         except Exception as error:
             LOGGER.error(f"Encountered an error : {error}")
 
-        time.sleep(15)  # rich presence is limited to once per 15 seconds
+        precedent_activity = current_activity
 
 
 def get_corresponding_infos(current_activity: dict) -> dict:
@@ -120,14 +130,14 @@ def set_progression(current_activity: dict, to_send: dict) -> dict:
     """
     if current_activity["state"] == "playing":
         duration = round(float(current_activity["duration"]) / 1000)
-        to_send["small_image"] = "play"
+        current_time = int(time.time())
         current_progress = round(
             duration * (float(current_activity["progress_percent"]) / 100)
         )
-        to_send["small_text"] = "Playing"
-        current_time = int(time.time())
         to_send["start"] = current_time - current_progress
         to_send["end"] = current_time + (duration - current_progress)
+        to_send["small_image"] = "play"
+        to_send["small_text"] = "Playing"
     elif current_activity["state"] == "paused":
         to_send["small_image"] = "pause"
         to_send["small_text"] = "Paused"
