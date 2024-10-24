@@ -77,3 +77,19 @@ Here's how the assets page looks with the repo images
 And how the RPC looks (here while listening to music for the example)
 
 ![RPC example](./img/doc/rpc_example.png)
+
+## Launching the script
+
+Just launch the main.py
+
+```bash
+python3 main.py
+```
+
+You may experience errors if you have medias with UTF-8 characters in the name for the logging
+
+To avoid that you can run
+
+```bash
+python3 -X utf8 main.py
+```
