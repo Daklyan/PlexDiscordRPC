@@ -90,12 +90,14 @@ def get_corresponding_infos(current_activity: dict) -> dict:
             + current_activity["media_index"]
         )
         to_send["large_image"] = "show"
+        to_send["large_text"] = current_activity["title"][:50]
         to_send["activity_type"] = 3
     # Movies
     elif current_activity["media_type"] == "movie":
         to_send = dict(details=current_activity["title"])
         to_send["state"] = f"({current_activity['year']})"
         to_send["large_image"] = "movie"
+        to_send["large_text"] = current_activity["title"][:50]
         to_send["activity_type"] = 3
     # Musics
     elif current_activity["media_type"] == "track":
@@ -106,14 +108,14 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         )
         to_send = dict(state=artists)
         to_send["large_image"] = "music"
-        to_send["details"] = "{:<2}".format(current_activity["parent_title"])
+        to_send["details"] = current_activity["title"][:50]
+        to_send["large_text"] = "{:<2}".format(current_activity["parent_title"])
         to_send["activity_type"] = 2
     # Others
     else:
         to_send = dict(state=current_activity["title"])
         to_send["large_image"] = "plex"
 
-    to_send["large_text"] = current_activity["title"][:50]
     to_send = set_progression(current_activity=current_activity, to_send=to_send)
 
     return to_send

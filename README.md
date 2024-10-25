@@ -6,7 +6,7 @@ This project makes a RPC in discord of your current activity on plex via Tautull
 
 ## Setup
 
-The project uses Tautulli API to get your Plex activity so you obviously need to have it installed (https://tautulli.com/#download)
+The project uses Tautulli API to get your Plex activity so you obviously need to have it installed (<https://tautulli.com/#download>)
 
 Install required packages
 
@@ -35,7 +35,7 @@ cp config.example.json config.json
 
 ### App creation
 
-For discord to display your RPC you need to create an application on the dev portal (https://discord.com/developers/applications/)
+For discord to display your RPC you need to create an application on the dev portal (<https://discord.com/developers/applications/>)
 
 The process is very straight forward
 
