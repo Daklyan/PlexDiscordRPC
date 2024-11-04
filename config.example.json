@@ -4,5 +4,7 @@
     "username" : "",
     "client_id" : "changeme",
     "libraries": [],
-    "excluded_devices": []
+    "excluded_devices": [],
+    "fanarttv_apikey": "changeme",
+    "tvdb_apikey": "changeme"
 }
