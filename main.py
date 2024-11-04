@@ -86,16 +86,19 @@ def get_corresponding_infos(current_activity: dict) -> dict:
     # Shows
     if current_activity["media_type"] == "episode":
         to_send = dict(
-            state=current_activity["parent_title"].replace("Season", "Saison")
-            + " - Épisode "
+            state="S"
+            + current_activity["parent_media_index"]
+            + "E"
             + current_activity["media_index"]
+            + " - "
+            + current_activity["title"]
         )
         artwork = get_item_cover(
             media_name=current_activity["grandparent_title"],
             media_type="tv",
         )
         to_send["large_image"] = artwork if artwork else "show"
-        to_send["large_text"] = current_activity["title"][:50]
+        to_send["large_text"] = current_activity["grandparent_title"][:50]
         to_send["activity_type"] = 3
     # Movies
     elif current_activity["media_type"] == "movie":
