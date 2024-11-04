@@ -1,5 +1,6 @@
 *.log
 *.txt
 config.json
+token_bearer.json
 __pycache__
 venv

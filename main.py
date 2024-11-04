@@ -4,6 +4,7 @@ import subprocess
 import tautulli
 
 from config import client_id
+from utils import get_item_cover, get_artist_picture
 
 # from pypresence import Presence
 # from pypresence import PyPresenceException
@@ -89,14 +90,22 @@ def get_corresponding_infos(current_activity: dict) -> dict:
             + " - Épisode "
             + current_activity["media_index"]
         )
-        to_send["large_image"] = "show"
+        artwork = get_item_cover(
+            media_name=current_activity["grandparent_title"],
+            media_type="tv",
+        )
+        to_send["large_image"] = artwork if artwork else "show"
         to_send["large_text"] = current_activity["title"][:50]
         to_send["activity_type"] = 3
     # Movies
     elif current_activity["media_type"] == "movie":
+        artwork = get_item_cover(
+            media_name=current_activity["grandparent_title"],
+            media_type="movies",
+        )
         to_send = dict(details=current_activity["title"])
         to_send["state"] = f"({current_activity['year']})"
-        to_send["large_image"] = "movie"
+        to_send["large_image"] = artwork if artwork else "movie"
         to_send["large_text"] = current_activity["title"][:50]
         to_send["activity_type"] = 3
     # Musics
@@ -107,7 +116,16 @@ def get_corresponding_infos(current_activity: dict) -> dict:
             else current_activity["grandparent_title"]
         )
         to_send = dict(state=artists)
-        to_send["large_image"] = "music"
+        artwork = get_item_cover(
+            media_name=current_activity["parent_title"],
+            media_type="music",
+            media_artist=current_activity["grandparent_title"],
+        )
+        to_send["large_image"] = artwork if artwork else "music"
+        artist_pic_url = get_artist_picture(current_activity["grandparent_title"])
+        if artist_pic_url:
+            to_send["small_image"] = artist_pic_url
+            to_send["small_text"] = current_activity["grandparent_title"]
         to_send["details"] = current_activity["title"][:50]
         to_send["large_text"] = "{:<2}".format(current_activity["parent_title"])
         to_send["activity_type"] = 2
@@ -139,8 +157,8 @@ def set_progression(current_activity: dict, to_send: dict) -> dict:
         )
         to_send["start"] = current_time - current_progress
         to_send["end"] = current_time + (duration - current_progress)
-        to_send["small_image"] = "play"
-        to_send["small_text"] = "Playing"
+        # to_send["small_image"] = "play"
+        # to_send["small_text"] = "Playing"
     elif current_activity["state"] == "paused":
         to_send["small_image"] = "pause"
         to_send["small_text"] = "Paused"

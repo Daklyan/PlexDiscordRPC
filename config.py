@@ -9,3 +9,5 @@ username = config['username']  # if blank, any user will be reported on your pro
 client_id = config['client_id']
 libraries = config['libraries']  # set this to [] if you want to use any library
 excluded_devices = config['excluded_devices']
+fanarttv_apikey = config['fanarttv_apikey']
+tvdb_apikey = config['tvdb_apikey']
