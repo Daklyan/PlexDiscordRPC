@@ -1,3 +1,4 @@
+import logging
 import json
 import os
 import requests
@@ -9,8 +10,26 @@ TVDB_URL = "https://api4.thetvdb.com/v4"
 FANARTTV_URL = "https://webservice.fanart.tv/v3"
 MBID_URL = "https://musicbrainz.org/ws/2"
 
+LOGGER = logging.getLogger(__name__)
+logging.basicConfig(
+    format="[%(levelname)s] - %(asctime)s %(message)s",
+    datefmt="%d/%m/%Y %H:%M:%S",
+    handlers=[logging.FileHandler("plex_rpc.log"), logging.StreamHandler()],
+    encoding="utf-8",
+    level=logging.INFO,
+)
+
 
 def get_artist_picture(artist_name: str) -> str:
+    """Fetches the picture of a given artist using their name.
+
+    Args:
+        artist_name (str): Name of the artist to get picture
+
+    Returns:
+        str: URL of the picture
+    """
+    LOGGER.debug(f"Fetching {artist_name} picture")
     try:
         id_url = f"{MBID_URL}/artist?query={artist_name}"
         headers = {"accept": "application/json"}
@@ -22,14 +41,29 @@ def get_artist_picture(artist_name: str) -> str:
         request = requests.get(url=pic_url, headers=headers)
         data = request.json()
         pic_url = data["artistthumb"][0]["url"]
-    except Exception:
+    except Exception as error:
+        LOGGER.error(f"Error while fetching {artist_name} picture: {error}")
         return None
 
     return pic_url
 
 
 def get_item_cover(media_name: str, media_type: str, media_artist=None) -> str:
+    """Gets an URL of a cover for a movie/show/album
+
+    Args:
+        media_name (str): Name of the media (e.g.: Vampire Hunter D: Bloodlust)
+        media_type (str): The type of the media (tv, movie, music)
+        media_artist (str, optional): The artist in the case of an album. Defaults to None.
+
+    Returns:
+        str: URL of the cover
+    """
     res_url = ""
+
+    if media_type not in ["tv", "movies", "music"]:
+        LOGGER.error(f"{media_type} is not a supported media type")
+        return None
 
     media_id = get_media_id(media_name, media_type, media_artist)
 
@@ -40,10 +74,13 @@ def get_item_cover(media_name: str, media_type: str, media_artist=None) -> str:
         media_route = "music/albums"
     else:
         media_route = media_type
+
     url = f"{FANARTTV_URL}/{media_route}/{media_id}?api_key={fanarttv_apikey}"
+
     try:
         request = requests.get(url=url)
-    except Exception:
+    except Exception as error:
+        LOGGER.error(f"Error while fetching {media_name} artwork: {error}")
         return None
 
     data = request.json()
@@ -52,7 +89,7 @@ def get_item_cover(media_name: str, media_type: str, media_artist=None) -> str:
         res_url = data["tvposter"][0]["url"]
     elif media_type == "movies":
         res_url = data["movieposter"][0]["url"]
-    else:
+    elif media_type == "music":
         _, album = data["albums"].popitem()
         res_url = album["albumcover"][0]["url"]
 
@@ -60,6 +97,19 @@ def get_item_cover(media_name: str, media_type: str, media_artist=None) -> str:
 
 
 def get_media_id(media_name: str, media_type: str, media_artist=None) -> str:
+    """Get an id recognizable by fanart.tv for a media.
+    IMDB id for movies
+    TVDB id for shows
+    MBID id for musics
+
+    Args:
+        media_name (str): Name of the media (e.g.: Vampire Hunter D: Bloodlust)
+        media_type (str): The type of the media (tv, movie, music)
+        media_artist (str, optional): The artist in the case of an album. Defaults to None.
+
+    Returns:
+        str: id of the media
+    """
     media_id = ""
 
     if media_type == "tv":
@@ -86,12 +136,18 @@ def get_media_id(media_name: str, media_type: str, media_artist=None) -> str:
                     break
         elif media_type == "music":
             media_id = data["releases"][0]["release-group"]["id"]
-    except Exception:
+    except Exception as error:
+        LOGGER.error(f"Error while getting {media_name} id: {error}")
         media_id = None
     return media_id
 
 
 def tvdb_login() -> str:
+    """Gets TVDB token stored locally or calls to generate a new one
+
+    Returns:
+        str: TVDB token
+    """
     if not os.path.isfile("./token_bearer.json"):
         write_token(token_bearer=get_bearer()["data"]["token"])
 
@@ -110,6 +166,11 @@ def tvdb_login() -> str:
 
 
 def get_bearer() -> dict:
+    """Calls TVDB API to get a token from API key
+
+    Returns:
+        dict: TVDB API response
+    """
     headers = {"Content-type": "application/json", "accept": "application/json"}
 
     request = requests.post(
@@ -120,6 +181,11 @@ def get_bearer() -> dict:
 
 
 def write_token(token_bearer: str):
+    """Writes TVDB token to local file called token_bearer.json
+
+    Args:
+        token_bearer (str): The TVDB token to write
+    """
     token = {"token": token_bearer, "date": datetime.today().strftime("%d-%m-%Y")}
     with open("./token_bearer.json", "w") as file:
         json.dump(token, file)

@@ -1,10 +1,9 @@
 import time
-import logging
 import subprocess
 import tautulli
 
 from config import client_id
-from utils import get_item_cover, get_artist_picture
+from utils import LOGGER, get_item_cover, get_artist_picture
 
 # from pypresence import Presence
 # from pypresence import PyPresenceException
@@ -13,16 +12,6 @@ from patchedPypresence.exceptions import PyPresenceException
 
 
 RPC = Presence(client_id)
-
-
-LOGGER = logging.getLogger(__name__)
-logging.basicConfig(
-    format="[%(levelname)s] - %(asctime)s %(message)s",
-    datefmt="%d/%m/%Y %H:%M:%S",
-    handlers=[logging.FileHandler("plex_rpc.log"), logging.StreamHandler()],
-    encoding="utf-8",
-    level=logging.INFO,
-)
 
 
 def main():
