@@ -54,7 +54,7 @@ def main():
                         + current_activity["title"]
                     )
                     RPC.update(**to_send)
-                    time.sleep(15)  # rich presence is limited to once per 15 seconds
+                    time.sleep(1)
             else:
                 RPC.clear()
         except Exception as error:
@@ -92,7 +92,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
     # Movies
     elif current_activity["media_type"] == "movie":
         artwork = get_item_cover(
-            media_name=current_activity["grandparent_title"],
+            media_name=current_activity["title"],
             media_type="movies",
         )
         to_send = dict(details=current_activity["title"])
@@ -118,6 +118,9 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         if artist_pic_url:
             to_send["small_image"] = artist_pic_url
             to_send["small_text"] = current_activity["grandparent_title"]
+        else:
+            to_send["small_image"] = "play"
+            to_send["small_text"] = "Playing"
         to_send["details"] = current_activity["title"][:50]
         to_send["large_text"] = "{:<2}".format(current_activity["parent_title"])
         to_send["activity_type"] = 2

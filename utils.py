@@ -9,6 +9,7 @@ from datetime import datetime
 TVDB_URL = "https://api4.thetvdb.com/v4"
 FANARTTV_URL = "https://webservice.fanart.tv/v3"
 MBID_URL = "https://musicbrainz.org/ws/2"
+COVERART_URL = "https://coverartarchive.org"
 
 LOGGER = logging.getLogger(__name__)
 logging.basicConfig(
@@ -65,38 +66,21 @@ def get_item_cover(media_name: str, media_type: str, media_artist=None) -> str:
         LOGGER.error(f"{media_type} is not a supported media type")
         return None
 
-    media_id = get_media_id(media_name, media_type, media_artist)
+    res_url = get_media_art(media_name, media_type, media_artist)
 
-    if not media_id:
+    if not res_url:
         return None
-
-    if media_type == "music":
-        media_route = "music/albums"
-    else:
-        media_route = media_type
-
-    url = f"{FANARTTV_URL}/{media_route}/{media_id}?api_key={fanarttv_apikey}"
-
-    try:
-        request = requests.get(url=url)
-    except Exception as error:
-        LOGGER.error(f"Error while fetching {media_name} artwork: {error}")
-        return None
-
-    data = request.json()
-
-    if media_type == "tv":
-        res_url = data["tvposter"][0]["url"]
-    elif media_type == "movies":
-        res_url = data["movieposter"][0]["url"]
-    elif media_type == "music":
-        _, album = data["albums"].popitem()
-        res_url = album["albumcover"][0]["url"]
 
     return res_url
 
 
-def get_media_id(media_name: str, media_type: str, media_artist=None) -> str:
+def get_album_cover(mbid_id: str) -> str:
+    url = f"{COVERART_URL}/release/{mbid_id}/front"
+    request = requests.get(url=url, allow_redirects=False)
+    return request.headers["Location"]
+
+
+def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
     """Get an id recognizable by fanart.tv for a media.
     IMDB id for movies
     TVDB id for shows
@@ -111,6 +95,8 @@ def get_media_id(media_name: str, media_type: str, media_artist=None) -> str:
         str: id of the media
     """
     media_id = ""
+    url = None
+    res_url = None
 
     if media_type == "tv":
         url = f"{TVDB_URL}/search?q={media_name}&type=series"
@@ -121,25 +107,27 @@ def get_media_id(media_name: str, media_type: str, media_artist=None) -> str:
             url = f"{MBID_URL}/release?query=artist:{media_artist}%20AND%20release:{media_name}"
         else:
             url = f"{MBID_URL}/release?query=release:{media_name}"
-    tvdb_token = tvdb_login()
-    headers = {"accept": "application/json", "Authorization": f"Bearer {tvdb_token}"}
     try:
+        tvdb_token = tvdb_login()
+        headers = {"accept": "application/json", "Authorization": f"Bearer {tvdb_token}"}
         encoded_url = requests.utils.requote_uri(url)
         request = requests.get(url=encoded_url, headers=headers)
         data = request.json()
-        if media_type == "tv":
-            media_id = data["data"][0]["tvdb_id"]
-        elif media_type == "movies":
-            for remote_id in data["data"][0]["remote_ids"]:
-                if remote_id["sourceName"] == "IMDB":
-                    media_id = remote_id["id"]
-                    break
+        tvdb_token = tvdb_login()
+        headers = {"accept": "application/json", "Authorization": f"Bearer {tvdb_token}"}
+        encoded_url = requests.utils.requote_uri(url)
+        request = requests.get(url=encoded_url, headers=headers)
+        data = request.json()
+
+        if media_type in ["tv", "movies"]:
+            res_url = data["data"][0]["thumbnail"]
         elif media_type == "music":
-            media_id = data["releases"][0]["release-group"]["id"]
+            media_id = data["releases"][0]["id"]
+            res_url = get_album_cover(media_id)
     except Exception as error:
         LOGGER.error(f"Error while getting {media_name} id: {error}")
-        media_id = None
-    return media_id
+        res_url = None
+    return res_url
 
 
 def tvdb_login() -> str:
