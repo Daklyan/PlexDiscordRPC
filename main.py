@@ -24,24 +24,29 @@ def main():
         time.sleep(30)
         RPC.connect()
     precedent_activity = {}
+    precedent_start = 0
     to_send = {}
     while True:
         try:
             current_activity = tautulli.get_my_activity()
             if current_activity is not None:
                 if precedent_activity:
-                    # Checking if user scrubbing through media
-                    progress_diff = abs(
-                        int(precedent_activity["progress_percent"])
-                        - int(current_activity["progress_percent"])
+                    # Checking if user is scrubbing through media
+                    duration = int(current_activity["duration"]) / 1000
+                    current_time = int(time.time())
+                    current_progress = duration * (
+                        float(current_activity["progress_percent"]) / 100
                     )
+                    start = current_time - current_progress
+                    progress_diff = abs(start - precedent_start)
                 if (
                     precedent_activity
                     and precedent_activity["file"] == current_activity["file"]
                     and precedent_activity["state"] == current_activity["state"]
-                    and progress_diff <= 1
+                    and progress_diff <= 15
                 ):
-                    # Not updating if same media or no scrubbing detecting (1% progress diff)
+                    # Not updating if same media or no scrubbing detecting
+                    # (max 15s diff)
                     pass
                 else:
                     to_send = get_corresponding_infos(current_activity=current_activity)
@@ -68,6 +73,7 @@ def main():
             LOGGER.error(f"Encountered an error : {error}")
 
         precedent_activity = current_activity
+        precedent_start = to_send.get("start", 0)
 
 
 def get_corresponding_infos(current_activity: dict) -> dict:
