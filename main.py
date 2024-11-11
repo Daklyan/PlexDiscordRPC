@@ -45,7 +45,7 @@ def main():
                     and precedent_activity["state"] == current_activity["state"]
                     and progress_diff <= 15
                 ):
-                    # Not updating if same media or no scrubbing detecting
+                    # Not updating if same media or no scrubbing detected
                     # (max 15s diff)
                     pass
                 else:

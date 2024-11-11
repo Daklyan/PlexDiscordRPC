@@ -113,11 +113,6 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
         encoded_url = requests.utils.requote_uri(url)
         request = requests.get(url=encoded_url, headers=headers)
         data = request.json()
-        tvdb_token = tvdb_login()
-        headers = {"accept": "application/json", "Authorization": f"Bearer {tvdb_token}"}
-        encoded_url = requests.utils.requote_uri(url)
-        request = requests.get(url=encoded_url, headers=headers)
-        data = request.json()
 
         if media_type in ["tv", "movies"]:
             res_url = data["data"][0]["thumbnail"]
