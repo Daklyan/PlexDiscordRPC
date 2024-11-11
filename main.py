@@ -32,18 +32,12 @@ def main():
             if current_activity is not None:
                 if precedent_activity:
                     # Checking if user is scrubbing through media
-                    duration = int(current_activity["duration"]) / 1000
-                    current_time = int(time.time())
-                    current_progress = duration * (
-                        float(current_activity["progress_percent"]) / 100
-                    )
-                    start = current_time - current_progress
-                    progress_diff = abs(start - precedent_start)
+                    progress_diff = abs(int(current_activity["progress_percent"]) - precedent_start)
                 if (
                     precedent_activity
                     and precedent_activity["file"] == current_activity["file"]
                     and precedent_activity["state"] == current_activity["state"]
-                    and progress_diff <= 15
+                    and progress_diff <= 5
                 ):
                     # Not updating if same media or no scrubbing detected
                     # (max 15s diff)
@@ -73,7 +67,7 @@ def main():
             LOGGER.error(f"Encountered an error : {error}")
 
         precedent_activity = current_activity
-        precedent_start = to_send.get("start", 0)
+        precedent_start = int(current_activity["progress_percent"]) # to_send.get("start", 0)
 
 
 def get_corresponding_infos(current_activity: dict) -> dict:
