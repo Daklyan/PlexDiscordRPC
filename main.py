@@ -39,9 +39,9 @@ def main():
                     precedent_activity
                     and precedent_activity["file"] == current_activity["file"]
                     and precedent_activity["state"] == current_activity["state"]
-                    and progress_diff <= 5
+                    and progress_diff <= 1
                 ):
-                    # Not updating if same media or no scrubbing detecting (5% progress diff)
+                    # Not updating if same media or no scrubbing detecting (1% progress diff)
                     pass
                 else:
                     to_send = get_corresponding_infos(current_activity=current_activity)
