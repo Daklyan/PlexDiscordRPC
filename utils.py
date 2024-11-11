@@ -77,7 +77,7 @@ def get_item_cover(media_name: str, media_type: str, media_artist=None) -> str:
 def get_album_cover(mbid_id: str) -> str:
     url = f"{COVERART_URL}/release/{mbid_id}/front"
     request = requests.get(url=url, allow_redirects=False)
-    return request.headers["Location"]
+    return request.headers.get("Location", None)
 
 
 def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:

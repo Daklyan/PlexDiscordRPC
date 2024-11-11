@@ -29,12 +29,19 @@ def main():
         try:
             current_activity = tautulli.get_my_activity()
             if current_activity is not None:
+                if precedent_activity:
+                    # Checking if user scrubbing through media
+                    progress_diff = abs(
+                        int(precedent_activity["progress_percent"])
+                        - int(current_activity["progress_percent"])
+                    )
                 if (
                     precedent_activity
                     and precedent_activity["file"] == current_activity["file"]
                     and precedent_activity["state"] == current_activity["state"]
+                    and progress_diff <= 5
                 ):
-                    # This works but need to improve in case the user scrubs through media
+                    # Not updating if same media or no scrubbing detecting (5% progress diff)
                     pass
                 else:
                     to_send = get_corresponding_infos(current_activity=current_activity)
