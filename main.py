@@ -37,7 +37,7 @@ def main():
                     precedent_activity
                     and precedent_activity["file"] == current_activity["file"]
                     and precedent_activity["state"] == current_activity["state"]
-                    and progress_diff <= 5
+                    and progress_diff < 8
                 ):
                     # Not updating if same media or no scrubbing detected
                     # (max 15s diff)
@@ -60,14 +60,15 @@ def main():
                         + current_activity["title"]
                     )
                     RPC.update(**to_send)
-                    time.sleep(1)
+
+                time.sleep(5)
+
+                precedent_activity = current_activity
+                precedent_start = int(current_activity.get("progress_percent", 0))
             else:
                 RPC.clear()
         except Exception as error:
             LOGGER.error(f"Encountered an error : {error}")
-
-        precedent_activity = current_activity
-        precedent_start = int(current_activity["progress_percent"]) # to_send.get("start", 0)
 
 
 def get_corresponding_infos(current_activity: dict) -> dict:
@@ -84,7 +85,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         to_send = dict(
             state="S"
             + current_activity["parent_media_index"]
-            + "E"
+            + "・E"
             + current_activity["media_index"]
             + " - "
             + current_activity["title"]
@@ -136,12 +137,12 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         to_send = dict(state=current_activity["title"])
         to_send["large_image"] = "plex"
 
-    to_send = set_progression(current_activity=current_activity, to_send=to_send)
+    to_send = set_progress(current_activity=current_activity, to_send=to_send)
 
     return to_send
 
 
-def set_progression(current_activity: dict, to_send: dict) -> dict:
+def set_progress(current_activity: dict, to_send: dict) -> dict:
     """Set the duration of the media as a timestamp if playing or paused if not
 
     Args:

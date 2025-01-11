@@ -10,6 +10,7 @@ TVDB_URL = "https://api4.thetvdb.com/v4"
 FANARTTV_URL = "https://webservice.fanart.tv/v3"
 MBID_URL = "https://musicbrainz.org/ws/2"
 COVERART_URL = "https://coverartarchive.org"
+WILDCARDS = ["?", "*"]
 
 LOGGER = logging.getLogger(__name__)
 logging.basicConfig(
@@ -41,8 +42,11 @@ def get_artist_picture(artist_name: str) -> str:
         pic_url = f"{FANARTTV_URL}/music/{artist_id}?api_key={fanarttv_apikey}"
         request = requests.get(url=pic_url, headers=headers)
         data = request.json()
-        pic_url = data["artistthumb"][0]["url"]
-    except Exception as error:
+        if data.get("artistthumb"):
+            pic_url = data["artistthumb"][0]["url"]
+        else:
+            pic_url = data["artistbackground"][0]["url"]
+    except requests.exceptions.RequestException as error:
         LOGGER.error(f"Error while fetching {artist_name} picture: {error}")
         return None
 
@@ -81,10 +85,7 @@ def get_album_cover(mbid_id: str) -> str:
 
 
 def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
-    """Get an id recognizable by fanart.tv for a media.
-    IMDB id for movies
-    TVDB id for shows
-    MBID id for musics
+    """Get the cover/poster for a media.
 
     Args:
         media_name (str): Name of the media (e.g.: Vampire Hunter D: Bloodlust)
@@ -98,6 +99,8 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
     url = None
     res_url = None
 
+    media_name = wildcard_security(media_name)
+
     if media_type == "tv":
         url = f"{TVDB_URL}/search?q={media_name}&type=series"
     elif media_type == "movies":
@@ -109,7 +112,10 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
             url = f"{MBID_URL}/release?query=release:{media_name}"
     try:
         tvdb_token = tvdb_login()
-        headers = {"accept": "application/json", "Authorization": f"Bearer {tvdb_token}"}
+        headers = {
+            "accept": "application/json",
+            "Authorization": f"Bearer {tvdb_token}",
+        }
         encoded_url = requests.utils.requote_uri(url)
         request = requests.get(url=encoded_url, headers=headers)
         data = request.json()
@@ -117,12 +123,29 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
         if media_type in ["tv", "movies"]:
             res_url = data["data"][0]["thumbnail"]
         elif media_type == "music":
-            media_id = data["releases"][0]["id"]
+            for release in data["releases"]:
+                if (
+                    wildcard_security(release["title"]).lower() == media_name.lower()
+                    and release.get("packaging") in ["None", "Jewel Case"]
+                ):
+                    media_id = release["id"]
+                    break
+            # media_id = data["releases"][0]["id"]
             res_url = get_album_cover(media_id)
-    except Exception as error:
+    except requests.exceptions.RequestException as error:
         LOGGER.error(f"Error while getting {media_name} id: {error}")
         res_url = None
     return res_url
+
+
+def wildcard_security(string: str) -> str:
+    res = ""
+    for char in string:
+        if char in WILDCARDS:
+            res += f"\\{char}"
+        else:
+            res += char
+    return res
 
 
 def tvdb_login() -> str:
@@ -140,6 +163,7 @@ def tvdb_login() -> str:
     today = datetime.today()
     token_date = datetime.strptime(file_data["date"], "%d-%m-%Y")
     time_diff = (today.year - token_date.year) * 12 + (today.month - token_date.month)
+
     if time_diff >= 1:
         token = get_bearer()["data"]["token"]
         write_token(token_bearer=token)
