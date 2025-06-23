@@ -7,7 +7,7 @@ from utils import LOGGER, get_item_cover, get_artist_picture
 
 # from pypresence import Presence
 # from pypresence import PyPresenceException
-from patchedPypresence.presence import Presence
+from patchedPypresence.presence import Presence, Activity
 from patchedPypresence.exceptions import PyPresenceException
 
 
@@ -96,7 +96,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         )
         to_send["large_image"] = artwork if artwork else "show"
         to_send["large_text"] = current_activity["grandparent_title"][:50]
-        to_send["activity_type"] = 3
+        to_send["activity_type"] = Activity.WATCHING.value
     # Movies
     elif current_activity["media_type"] == "movie":
         artwork = get_item_cover(
@@ -107,7 +107,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         to_send["state"] = f"({current_activity['year']})"
         to_send["large_image"] = artwork if artwork else "movie"
         to_send["large_text"] = current_activity["title"][:50]
-        to_send["activity_type"] = 3
+        to_send["activity_type"] = Activity.WATCHING.value
     # Musics
     elif current_activity["media_type"] == "track":
         artists = (
@@ -131,11 +131,12 @@ def get_corresponding_infos(current_activity: dict) -> dict:
             to_send["small_text"] = "Playing"
         to_send["details"] = current_activity["title"][:50]
         to_send["large_text"] = "{:<2}".format(current_activity["parent_title"])
-        to_send["activity_type"] = 2
+        to_send["activity_type"] = Activity.LISTENING.value
     # Others
     else:
         to_send = dict(state=current_activity["title"])
         to_send["large_image"] = "plex"
+        to_send["activity_type"] = Activity.PLAYING.value
 
     to_send = set_progress(current_activity=current_activity, to_send=to_send)
 

@@ -21,6 +21,8 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+APP_HEADER = "DiscordRPC/v0.0.1"
+
 
 def get_artist_picture(artist_name: str) -> str:
     """Fetches the picture of a given artist using their name.
@@ -34,7 +36,7 @@ def get_artist_picture(artist_name: str) -> str:
     LOGGER.debug(f"Fetching {artist_name} picture")
     try:
         id_url = f"{MBID_URL}/artist?query={artist_name}"
-        headers = {"accept": "application/json"}
+        headers = {"accept": "application/json", "User-Agent": APP_HEADER}
         request = requests.get(url=id_url, headers=headers)
         data = request.json()
         artist_id = data["artists"][0]["id"]
@@ -115,13 +117,14 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
         headers = {
             "accept": "application/json",
             "Authorization": f"Bearer {tvdb_token}",
+            "User-Agent": APP_HEADER
         }
         encoded_url = requests.utils.requote_uri(url)
         request = requests.get(url=encoded_url, headers=headers)
         data = request.json()
 
         if media_type in ["tv", "movies"]:
-            res_url = data["data"][0]["thumbnail"]
+            res_url = get_thumbnail(data["data"])  # data["data"][0]["thumbnail"]
         elif media_type == "music":
             for release in data["releases"]:
                 if (
@@ -130,7 +133,7 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
                 ):
                     media_id = release["id"]
                     break
-            # media_id = data["releases"][0]["id"]
+            media_id = data["releases"][0]["id"]
             res_url = get_album_cover(media_id)
     except requests.exceptions.RequestException as error:
         LOGGER.error(f"Error while getting {media_name} id: {error}")
@@ -146,6 +149,13 @@ def wildcard_security(string: str) -> str:
         else:
             res += char
     return res
+
+
+def get_thumbnail(data: dict) -> str:
+    for dict in data:
+        if dict.get("thumbnail"):
+            return dict["thumbnail"]
+    return ""
 
 
 def tvdb_login() -> str:
@@ -196,3 +206,4 @@ def write_token(token_bearer: str):
     token = {"token": token_bearer, "date": datetime.today().strftime("%d-%m-%Y")}
     with open("./token_bearer.json", "w") as file:
         json.dump(token, file)
+

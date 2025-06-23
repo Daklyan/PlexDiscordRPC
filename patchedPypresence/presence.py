@@ -2,10 +2,15 @@ import json
 import os
 import time
 
+from enum import Enum
 from .baseclient import BaseClient
 from .payloads import Payload
 from .utils import remove_none, get_event_loop
 
+class Activity(Enum):
+    PLAYING = 0
+    LISTENING = 2
+    WATCHING = 3
 
 class Presence(BaseClient):
 
