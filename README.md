@@ -6,6 +6,8 @@ This project makes a RPC in discord of your current activity on plex via Tautull
 
 ## Setup
 
+THE TAUTULLI PART IS OUTDATED AND NOW USING X-PLEX-TOKEN
+README NEEDS TO BE UPDATED
 The project uses Tautulli API to get your Plex activity so you obviously need to have it installed (<https://tautulli.com/#download>)
 
 Install required packages

@@ -3,11 +3,11 @@ import json
 with open("config.json") as f:
     config = json.loads(f.read())
 
-apikey = config['apikey']  # tautulli API key
-host = config['host']  # host and port of tautulli (include base URL for reverse proxy)
-username = config['username']  # if blank, any user will be reported on your profile
-client_id = config['client_id']
-libraries = config['libraries']  # set this to [] if you want to use any library
-excluded_devices = config['excluded_devices']
-fanarttv_apikey = config['fanarttv_apikey']
-tvdb_apikey = config['tvdb_apikey']
+username = config["username"]  # if blank, any user will be reported on your profile
+client_id = config["client_id"]
+libraries = config["libraries"]  # set this to [] if you want to use any library
+fanarttv_apikey = config["fanarttv_apikey"]
+tvdb_apikey = config["tvdb_apikey"]
+x_plex_token = config["x_plex_token"]
+plex_address = config.get("plex_address", "localhost")
+plex_port = config.get("plex_port", "32400")
