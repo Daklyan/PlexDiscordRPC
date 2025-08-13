@@ -2,13 +2,11 @@
 
 ## Intro
 
-This project makes a RPC in discord of your current activity on plex via Tautulli API
+This project makes a RPC in discord of your current activity on Plex
 
 ## Setup
 
-THE TAUTULLI PART IS OUTDATED AND NOW USING X-PLEX-TOKEN
-README NEEDS TO BE UPDATED
-The project uses Tautulli API to get your Plex activity so you obviously need to have it installed (<https://tautulli.com/#download>)
+To get Plex activity will need your X-Plex-Token, look at [here](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/) if you don't know how
 
 Install required packages
 
@@ -24,12 +22,14 @@ cp config.example.json config.json
 
 ```json
 {
-    "apikey": "changeme", <- This is your Tautulli api key (found in Settings -> Web Interface)
-    "host" : "127.0.0.1:8181", <- This the IP / domain to access Tautulli, leave it as is if Tautulli run on the same computer as the script
     "username" : "", <- Plex user to track by the script, if you leave it blank it will apply to any user
     "client_id" : "changeme", <- ID of the discord application
     "libraries": [], <- Plex library to track by the script, if you leave it blank it will apply to every library of the plex server
-    "excluded_devices": [] <- List of devices to be ignored by the script, you can leave it blank if not needed
+    "fanarttv_apikey": "changeme", <- API Key to get Artist illustration on fanart.tv
+    "tvdb_apikey": "changeme", <- API Key to get Show/Movie illustration from tvdb
+    "x_plex_token": "changeme", <- X-Plex-Token to get Plex activity
+    "plex_address": "127.0.0.1",
+    "plex_port": "32400"
 }
 ```
 
@@ -74,6 +74,7 @@ Here are the categories :
 - pause
 
 Here's how the assets page looks with the repo images
+
 ![Assets page filled](./img/doc/assets_page.png)
 
 And how the RPC looks (here while listening to music for the example)

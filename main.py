@@ -7,7 +7,7 @@ from utils import LOGGER, get_item_cover, get_artist_picture
 
 # from pypresence import Presence
 # from pypresence import PyPresenceException
-from patchedPypresence.presence import Presence, Activity, DisplayType
+from patchedPypresence.presence import Presence, Activity, StatusDisplay
 from patchedPypresence.exceptions import PyPresenceException
 
 
@@ -38,7 +38,7 @@ def main():
                     )
                 if (
                     precedent_activity
-                    # and precedent_activity["file"] == current_activity["file"]
+                    and precedent_activity["title"] == precedent_activity["title"]
                     and precedent_activity["Player"]["state"]
                     == current_activity["Player"]["state"]
                     and progress_diff < 10
@@ -100,7 +100,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         to_send["large_image"] = artwork if artwork else "show"
         to_send["large_text"] = current_activity["grandparentTitle"][:50]
         to_send["activity_type"] = Activity.WATCHING.value
-        to_send["status_display_type"] = DisplayType.DETAILS.value
+        to_send["status_display_type"] = StatusDisplay.DETAILS.value
     # Movies
     elif current_activity["type"] == "movie":
         artwork = get_item_cover(
@@ -112,7 +112,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         to_send["large_image"] = artwork if artwork else "movie"
         to_send["large_text"] = current_activity["title"][:50]
         to_send["activity_type"] = Activity.WATCHING.value
-        to_send["status_display_type"] = DisplayType.DETAILS.value
+        to_send["status_display_type"] = StatusDisplay.DETAILS.value
     # Musics
     elif current_activity["type"] == "track":
         artists = (
@@ -137,13 +137,13 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         to_send["details"] = current_activity["title"][:50]
         to_send["large_text"] = "{:<2}".format(current_activity["parentTitle"])
         to_send["activity_type"] = Activity.LISTENING.value
-        to_send["status_display_type"] = DisplayType.STATE.value
+        to_send["status_display_type"] = StatusDisplay.STATE.value
     # Others
     else:
         to_send = dict(state=current_activity["title"])
         to_send["large_image"] = "plex"
         to_send["activity_type"] = Activity.PLAYING.value
-        to_send["status_display_type"] = DisplayType.NAME.value
+        to_send["status_display_type"] = StatusDisplay.NAME.value
 
     to_send = set_progress(current_activity=current_activity, to_send=to_send)
 

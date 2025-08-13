@@ -14,7 +14,7 @@ class Activity(Enum):
     WATCHING = 3
 
 
-class DisplayType(Enum):
+class StatusDisplay(Enum):
     NAME = 0
     STATE = 1
     DETAILS = 2
