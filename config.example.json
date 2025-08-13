@@ -1,10 +1,10 @@
 {
-    "apikey": "changeme",
-    "host" : "127.0.0.1:8181",
-    "username" : "",
-    "client_id" : "changeme",
-    "libraries": [],
-    "excluded_devices": [],
-    "fanarttv_apikey": "changeme",
-    "tvdb_apikey": "changeme"
+  "username": "",
+  "client_id": "changeme",
+  "libraries": [],
+  "fanarttv_apikey": "changeme",
+  "tvdb_apikey": "changeme",
+  "x_plex_token": "changeme",
+  "plex_address": "127.0.0.1",
+  "plex_port": "32400"
 }
