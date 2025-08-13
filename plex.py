@@ -34,9 +34,3 @@ def get_my_activity(username=username, libraries=libraries):
             # print(json.dumps(stream, indent=4))
             return stream
     return None
-
-
-# if __name__ == "__main__":
-#    while True:
-#        print(json.dumps(get_activity(), indent=4))
-#        time.sleep(3)
