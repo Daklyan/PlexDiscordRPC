@@ -96,6 +96,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         artwork = get_item_cover(
             media_name=current_activity["grandparentTitle"],
             media_type="tv",
+            year=current_activity["year"],
         )
         to_send["large_image"] = artwork if artwork else "show"
         to_send["large_text"] = current_activity["grandparentTitle"][:50]
@@ -106,6 +107,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         artwork = get_item_cover(
             media_name=current_activity["title"],
             media_type="movies",
+            year=current_activity["year"],
         )
         to_send = dict(details=current_activity["title"])
         to_send["state"] = f"({current_activity['year']})"

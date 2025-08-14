@@ -55,7 +55,9 @@ def get_artist_picture(artist_name: str) -> str:
     return pic_url
 
 
-def get_item_cover(media_name: str, media_type: str, media_artist=None) -> str:
+def get_item_cover(
+    media_name: str, media_type: str, year=None, media_artist=None
+) -> str:
     """Gets an URL of a cover for a movie/show/album
 
     Args:
@@ -72,7 +74,7 @@ def get_item_cover(media_name: str, media_type: str, media_artist=None) -> str:
         LOGGER.error(f"{media_type} is not a supported media type")
         return None
 
-    res_url = get_media_art(media_name, media_type, media_artist)
+    res_url = get_media_art(media_name, media_type, year, media_artist)
 
     if not res_url:
         return None
@@ -86,7 +88,9 @@ def get_album_cover(mbid_id: str) -> str:
     return request.headers.get("Location", None)
 
 
-def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
+def get_media_art(
+    media_name: str, media_type: str, year=None, media_artist=None
+) -> str:
     """Get the cover/poster for a media.
 
     Args:
@@ -104,9 +108,9 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
     media_name = wildcard_security(media_name)
 
     if media_type == "tv":
-        url = f"{TVDB_URL}/search?q={media_name}&type=series"
+        url = f"{TVDB_URL}/search?q={media_name}&type=series&year={year}"
     elif media_type == "movies":
-        url = f"{TVDB_URL}/search?q={media_name}&type=movie"
+        url = f"{TVDB_URL}/search?q={media_name}&type=movie&year={year}"
     elif media_type == "music":
         if media_artist:
             url = f"{MBID_URL}/release?query=artist:{media_artist}%20AND%20release:{media_name}"
@@ -117,7 +121,7 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
         headers = {
             "accept": "application/json",
             "Authorization": f"Bearer {tvdb_token}",
-            "User-Agent": APP_HEADER
+            "User-Agent": APP_HEADER,
         }
         encoded_url = requests.utils.requote_uri(url)
         request = requests.get(url=encoded_url, headers=headers)
@@ -127,10 +131,12 @@ def get_media_art(media_name: str, media_type: str, media_artist=None) -> str:
             res_url = get_thumbnail(data["data"])  # data["data"][0]["thumbnail"]
         elif media_type == "music":
             for release in data["releases"]:
-                if (
-                    wildcard_security(release["title"]).lower() == media_name.lower()
-                    and release.get("packaging") in ["None", "Jewel Case"]
-                ):
+                if wildcard_security(
+                    release["title"]
+                ).lower() == media_name.lower() and release.get("packaging") in [
+                    "None",
+                    "Jewel Case",
+                ]:
                     media_id = release["id"]
                     break
             media_id = data["releases"][0]["id"]
@@ -206,4 +212,3 @@ def write_token(token_bearer: str):
     token = {"token": token_bearer, "date": datetime.today().strftime("%d-%m-%Y")}
     with open("./token_bearer.json", "w") as file:
         json.dump(token, file)
-
