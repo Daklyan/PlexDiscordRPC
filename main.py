@@ -41,10 +41,10 @@ def main():
                     and precedent_activity["title"] == precedent_activity["title"]
                     and precedent_activity["Player"]["state"]
                     == current_activity["Player"]["state"]
-                    and progress_diff < 10
+                    and progress_diff < 15
                 ):
                     # Not updating if same media or no scrubbing detected
-                    pass
+                    precedent_start = int(current_activity["viewOffset"] / 1000)
                 else:
                     to_send = get_corresponding_infos(current_activity=current_activity)
                     if (
@@ -96,7 +96,6 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         artwork = get_item_cover(
             media_name=current_activity["grandparentTitle"],
             media_type="tv",
-            year=current_activity["year"],
         )
         to_send["large_image"] = artwork if artwork else "show"
         to_send["large_text"] = current_activity["grandparentTitle"][:50]
