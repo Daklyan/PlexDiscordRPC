@@ -44,7 +44,7 @@ def main():
                     and progress_diff < 15
                 ):
                     # Not updating if same media or no scrubbing detected
-                    precedent_start = int(current_activity["viewOffset"] / 1000)
+                    pass
                 else:
                     to_send = get_corresponding_infos(current_activity=current_activity)
                     if (
