@@ -12,14 +12,9 @@ MBID_URL = "https://musicbrainz.org/ws/2"
 COVERART_URL = "https://coverartarchive.org"
 WILDCARDS = ["?", "*"]
 
-LOGGER = logging.getLogger(__name__)
-logging.basicConfig(
-    format="[%(levelname)s] - %(asctime)s %(message)s",
-    datefmt="%d/%m/%Y %H:%M:%S",
-    handlers=[logging.FileHandler("plex_rpc.log"), logging.StreamHandler()],
-    encoding="utf-8",
-    level=logging.INFO,
-)
+from logger import setup_logger
+
+LOGGER = setup_logger(__name__)
 
 APP_HEADER = "DiscordRPC/v0.0.1"
 
@@ -108,7 +103,7 @@ def get_media_art(
     media_name = wildcard_security(media_name)
 
     if media_type == "tv":
-        url = f"{TVDB_URL}/search?q={media_name}&type=series&year={year}"
+        url = f"{TVDB_URL}/search?q={media_name}&type=series"
     elif media_type == "movies":
         url = f"{TVDB_URL}/search?q={media_name}&type=movie&year={year}"
     elif media_type == "music":

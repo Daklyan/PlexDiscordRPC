@@ -81,7 +81,7 @@ And how the RPC looks (here while listening to music for the example)
 
 ![RPC example](./img/doc/rpc_example.png)
 
-## Launching the script
+## Launching the script manually
 
 Just launch the main.py
 
@@ -95,4 +95,22 @@ To avoid that you can run
 
 ```bash
 python3 -X utf8 main.py
+```
+
+## Using docker
+
+### Building the Docker Image
+
+To build the Docker image, run the following command:
+
+```bash
+docker build -t plex-discord-rpc .
+```
+
+### Running Docker Compose
+
+To run the Docker Compose setup, use the following command:
+
+```bash
+docker-compose up
 ```

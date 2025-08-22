@@ -18,19 +18,19 @@ def main():
     try:
         RPC.connect()
     except PyPresenceException as error:
-        LOGGER.error(f"Encountered a discord error : {error}")
-        LOGGER.info("Launching discord")
-        subprocess.Popen("discord")
-        time.sleep(30)
-        RPC.connect()
+        reconnect_to_discord()
+
     precedent_activity = {}
     precedent_start = 0
     to_send = {}
+
+    LOGGER.info("🚀 Discord Plex RPC launched, waiting for Plex Activity...")
+    
     while True:
         try:
             current_activity = plex.get_my_activity()
             # print(json.dumps(current_activity, indent=2))
-            if current_activity is not None:
+            if current_activity:
                 if precedent_activity:
                     # Checking if user is scrubbing through media
                     progress_diff = abs(
@@ -72,6 +72,20 @@ def main():
                 RPC.clear()
         except Exception as error:
             LOGGER.error(f"Encountered an error : {error}")
+        except PyPresenceException:
+            reconnect_to_discord()
+
+
+def reconnect_to_discord():
+    LOGGER.warning("⚠️ Attempting to reconnect to Discord")
+    while True:
+        try:
+            RPC.connect()
+            break
+        except PyPresenceException as reconnect_error:
+            LOGGER.error(f"❌ Failed to reconnect to Discord: {reconnect_error}")
+            LOGGER.warning("⚠️ Retrying in 30 seconds")
+            time.sleep(30)
 
 
 def get_corresponding_infos(current_activity: dict) -> dict:
