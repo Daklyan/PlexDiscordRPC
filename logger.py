@@ -24,5 +24,7 @@ def setup_logger(name):
     formatter = logging.Formatter('[%(levelname)s] - %(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    logger.addHandler(logging.FileHandler('plex_rpc.log'))
+    file_handler = logging.FileHandler('plex_rpc.log')
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
     return logger
