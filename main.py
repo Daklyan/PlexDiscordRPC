@@ -3,6 +3,7 @@ import subprocess
 import plex
 
 from config import client_id
+from socket import error as SocketError
 from utils import LOGGER, get_item_cover, get_artist_picture
 
 # from pypresence import Presence
@@ -17,8 +18,12 @@ RPC = Presence(client_id)
 def main():
     try:
         RPC.connect()
-    except PyPresenceException as error:
+    except (PyPresenceException, SocketError) as error:
+        LOGGER.error(f"❌ Failed to connect to Discord: {error}")
         reconnect_to_discord()
+    except Exception as error:
+        LOGGER.error(f"❌ Got an unexpected error: {error}")
+        exit(1)
 
     precedent_activity = {}
     precedent_start = 0
@@ -84,6 +89,10 @@ def reconnect_to_discord():
             break
         except PyPresenceException as reconnect_error:
             LOGGER.error(f"❌ Failed to reconnect to Discord: {reconnect_error}")
+            LOGGER.warning("⚠️ Retrying in 30 seconds")
+            time.sleep(30)
+        except SocketError as socker_error:
+            LOGGER.error(f"❌ Got a socket error while connecting to Discord client: {socker_error}")
             LOGGER.warning("⚠️ Retrying in 30 seconds")
             time.sleep(30)
 
