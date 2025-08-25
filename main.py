@@ -102,14 +102,12 @@ def reconnect_to_discord():
         except SocketError as socker_error:
             if socker_error.errno == 104:
                 LOGGER.error(f"❌ Connection reset by peer: {socker_error}")
-                LOGGER.warning("⚠️ Retrying in 30 seconds")
-                time.sleep(30)
             else:
                 LOGGER.error(
                     f"❌ Got a socket error while connecting to Discord client: {socker_error}"
                 )
-                LOGGER.warning("⚠️ Retrying in 30 seconds")
-                time.sleep(30)
+            LOGGER.warning("⚠️ Retrying in 30 seconds")
+            time.sleep(30)
         except Exception as error:
             LOGGER.error(f"❌ Unexpected error while reconnecting to Discord: {error}")
             LOGGER.warning("⚠️ Retrying in 30 seconds")
