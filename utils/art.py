@@ -114,10 +114,9 @@ def get_media_art(
         else:
             url = f"{MBID_URL}/release?query=release:{media_name}"
     try:
-        tvdb_token = tvdb_login()
         headers = {
             "accept": "application/json",
-            "Authorization": f"Bearer {tvdb_token}",
+            "Authorization": f"Bearer {tvdb_login()}",
             "User-Agent": APP_HEADER,
         }
         encoded_url = requests.utils.requote_uri(url)

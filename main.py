@@ -125,14 +125,13 @@ def get_corresponding_infos(current_activity: dict) -> dict:
     Returns:
         dict: Dict with the informations to send to discord RPC
     """
-    to_send = {}
     match current_activity["type"]:
         case "episode":
-            to_send = parse_episode(current_activity=current_activity, to_send=to_send)
+            to_send = parse_episode(current_activity)
         case "movie":
-            to_send = parse_movie(current_activity=current_activity, to_send=to_send)
+            to_send = parse_movie(current_activity)
         case "track":
-            to_send = parse_track(current_activity=current_activity, to_send=to_send)
+            to_send = parse_track(ccurrent_activity)
         case _:
             to_send = dict(state=current_activity["title"])
             to_send["large_image"] = "plex"
@@ -144,7 +143,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
     return to_send
 
 
-def parse_episode(current_activity: dict, to_send: dict) -> dict:
+def parse_episode(current_activity: dict) -> dict:
     """Parse infos for an episode
 
     Args:
@@ -176,7 +175,7 @@ def parse_episode(current_activity: dict, to_send: dict) -> dict:
     return to_send
 
 
-def parse_movie(current_activity: dict, to_send: dict) -> dict:
+def parse_movie(current_activity: dict) -> dict:
     """Parse infos for a movie
 
     Args:
@@ -202,7 +201,7 @@ def parse_movie(current_activity: dict, to_send: dict) -> dict:
     return to_send
 
 
-def parse_track(current_activity: dict, to_send: dict) -> dict:
+def parse_track(current_activity: dict) -> dict:
     """Parse infos for a track
     Args:
         current_activity (dict): Current activity provided by Plex
