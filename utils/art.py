@@ -1,4 +1,3 @@
-import logging
 import json
 import os
 import requests
@@ -6,20 +5,18 @@ import requests
 from config import tvdb_apikey, fanarttv_apikey
 from datetime import datetime
 
+from utils.logger import setup_logger
+
 TVDB_URL = "https://api4.thetvdb.com/v4"
 FANARTTV_URL = "https://webservice.fanart.tv/v3"
 MBID_URL = "https://musicbrainz.org/ws/2"
 COVERART_URL = "https://coverartarchive.org"
 WILDCARDS = ["?", "*"]
-
-from logger import setup_logger
-
+APP_HEADER = "DiscordRPC/v0.0.1"
 LOGGER = setup_logger(__name__)
 
-APP_HEADER = "DiscordRPC/v0.0.1"
 
-
-def get_artist_picture(artist_name: str) -> str:
+def get_artist_picture(artist_name: str) -> str | None:
     """Fetches the picture of a given artist using their name.
 
     Args:
@@ -52,7 +49,7 @@ def get_artist_picture(artist_name: str) -> str:
 
 def get_item_cover(
     media_name: str, media_type: str, year=None, media_artist=None
-) -> str:
+) -> str | None:
     """Gets an URL of a cover for a movie/show/album
 
     Args:
@@ -71,13 +68,18 @@ def get_item_cover(
 
     res_url = get_media_art(media_name, media_type, year, media_artist)
 
-    if not res_url:
-        return None
-
-    return res_url
+    return res_url if res_url else None
 
 
-def get_album_cover(mbid_id: str) -> str:
+def get_album_cover(mbid_id: str) -> str | None:
+    """Gets album cover from MBID
+
+    Args:
+        mbid_id (str): MBID album id
+
+    Returns:
+        str: URL of the album cover
+    """
     url = f"{COVERART_URL}/release/{mbid_id}/front"
     request = requests.get(url=url, allow_redirects=False)
     return request.headers.get("Location", None)
@@ -85,7 +87,7 @@ def get_album_cover(mbid_id: str) -> str:
 
 def get_media_art(
     media_name: str, media_type: str, year=None, media_artist=None
-) -> str:
+) -> str | None:
     """Get the cover/poster for a media.
 
     Args:
@@ -143,6 +145,14 @@ def get_media_art(
 
 
 def wildcard_security(string: str) -> str:
+    """Puts backslash in case of wildcard (for example: ? by XXXTENTACION)
+
+    Args:
+        string (str): String to check
+
+    Returns:
+        str: String with backslash before wildcards if found
+    """
     res = ""
     for char in string:
         if char in WILDCARDS:
@@ -153,6 +163,14 @@ def wildcard_security(string: str) -> str:
 
 
 def get_thumbnail(data: dict) -> str:
+    """Returns first thumbnail URL found
+
+    Args:
+        data (dict): Get thumbnail for a show episode or a movie
+
+    Returns:
+        str: URL of the thumbnail
+    """
     for dict in data:
         if dict.get("thumbnail"):
             return dict["thumbnail"]
