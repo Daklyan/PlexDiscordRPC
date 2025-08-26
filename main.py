@@ -50,10 +50,7 @@ def main():
                     precedent_activity
                     and precedent_activity["title"] != current_activity["title"]
                     and precedent_activity["Player"]["state"] != current_activity["Player"]["state"]
-                    and (
-                        precedent_activity
-                        and abs(int(current_activity["viewOffset"] / 1000) - precedent_start) >= 15
-                    )
+                    and abs(int(current_activity["viewOffset"] / 1000) - precedent_start) >= 15
                 )
 
                 if should_update:
@@ -89,17 +86,18 @@ def main():
         except SocketError as error:
             if error.errno == 104:
                 LOGGER.error(f"❌ Connection reset by peer: {error}")
-                reconnect_to_discord()
             else:
                 LOGGER.error(f"❌ Failed to connect to Discord: {error}")
-                reconnect_to_discord()
+            reconnect_to_discord()
         except Exception as error:
             LOGGER.error(f"❌ Encountered an unexpected error : {error}")
+            time.sleep(10)
 
 
 def reconnect_to_discord():
     """Infinite loop until connected to Discord client"""
     LOGGER.warning("⚠️ Attempting to reconnect to Discord")
+
     while True:
         try:
             RPC.connect()
@@ -119,6 +117,8 @@ def reconnect_to_discord():
             LOGGER.error(f"❌ Unexpected error while reconnecting to Discord: {error}")
             LOGGER.warning("⚠️ Retrying in 30 seconds")
             time.sleep(30)
+
+    LOGGER.info("✔️ Reconnected successfully to Discord")
 
 
 def get_corresponding_infos(current_activity: dict) -> dict:

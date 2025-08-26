@@ -49,7 +49,7 @@ def get_artist_picture(artist_name: str) -> str | None:
 
         set_cached_data(cache_key, pic_url)
     except requests.exceptions.RequestException as error:
-        LOGGER.error(f"Error while fetching {artist_name} picture: {error}")
+        LOGGER.error(f"❌ Error while fetching {artist_name} picture: {error}")
         return None
 
     return pic_url
@@ -69,7 +69,7 @@ def get_item_cover(
         str: URL of the cover
     """
     if media_type not in ["tv", "movies", "music"]:
-        LOGGER.error(f"{media_type} is not a supported media type")
+        LOGGER.error(f"❌ {media_type} is not a supported media type")
         return None
 
     cache_key = f"cover_{media_type}_{media_name}_{year}_{media_artist}"
@@ -152,7 +152,7 @@ def get_media_art(
             media_id = data["releases"][0]["id"]
             res_url = get_album_cover(media_id)
     except requests.exceptions.RequestException as error:
-        LOGGER.error(f"Error while getting {media_name} id: {error}")
+        LOGGER.error(f"❌ Error while getting {media_name} id: {error}")
         res_url = None
     return res_url
 
