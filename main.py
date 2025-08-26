@@ -48,9 +48,9 @@ def main():
                 # Only update if there's a significant change in activity
                 should_update = not (
                     precedent_activity
-                    and precedent_activity["title"] != current_activity["title"]
-                    and precedent_activity["Player"]["state"] != current_activity["Player"]["state"]
-                    and abs(int(current_activity["viewOffset"] / 1000) - precedent_start) >= 15
+                    and precedent_activity["title"] == precedent_activity["title"]
+                    and precedent_activity["Player"]["state"] == current_activity["Player"]["state"]
+                    and abs(int(current_activity["viewOffset"] / 1000) - precedent_start) < 15
                 )
                 
                 if should_update:
@@ -72,9 +72,9 @@ def main():
                     )
                     RPC.update(**to_send)
 
-                    # Update precedent activity
-                    precedent_activity = current_activity
-                    precedent_start = int(current_activity["viewOffset"] / 1000)
+                # Update precedent activity
+                precedent_activity = current_activity
+                precedent_start = int(current_activity["viewOffset"] / 1000)
             else:
                 RPC.clear()
                 precedent_activity = {}
