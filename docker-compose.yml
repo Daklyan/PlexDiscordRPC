@@ -2,7 +2,6 @@
 services:
   plex-discord-rpc:
     build: .
-    # image: plex-discord-rpc
     container_name: plex-discord-rpc
     network_mode: host
     restart: unless-stopped

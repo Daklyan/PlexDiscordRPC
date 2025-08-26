@@ -99,18 +99,24 @@ python3 -X utf8 main.py
 
 ## Using docker
 
-### Building the Docker Image
+### Building and running the Docker Image
 
-To build the Docker image, run the following command:
+⚠️ Only works for linux atm as I mount the socket in the docker compose
+⚠️ The path for the Discord socket might vary from a distro to another
 
+With docker compose
 ```bash
-docker build -t plex-discord-rpc .
+docker compose up -d --build
 ```
 
-### Running Docker Compose
-
-To run the Docker Compose setup, use the following command:
-
+Pure docker
 ```bash
-docker-compose up
+docker build -t plex-discord-rpc .
+docker run -d --name plex-discord-rpc --network host \
+  --restart unless-stopped \
+  -e TZ=Europe/Paris \
+  -v /run/user/1000/discord-ipc-0:/tmp/discord-ipc-0:ro \
+  -v ./plex_rpc.log:/app/plex_rpc.log \
+  -v ./config.json:/app/config.json \
+  plex-discord-rpc
 ```
