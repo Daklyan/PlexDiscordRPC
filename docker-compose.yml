@@ -1,3 +1,4 @@
+---
 services:
   plex-discord-rpc:
     build: .
@@ -11,3 +12,4 @@ services:
       - /run/user/1000/discord-ipc-0:/tmp/discord-ipc-0:ro
       - ./plex_rpc.log:/app/plex_rpc.log
       - ./config.json:/app/config.json
+...

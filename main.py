@@ -47,10 +47,10 @@ def main():
             if current_activity:
                 # Only update if there's a significant change in activity
                 should_update = (
-                    not precedent_activity
-                    or precedent_activity["title"] != current_activity["title"]
-                    or precedent_activity["Player"]["state"] != current_activity["Player"]["state"]
-                    or (
+                    precedent_activity
+                    and precedent_activity["title"] != current_activity["title"]
+                    and precedent_activity["Player"]["state"] != current_activity["Player"]["state"]
+                    and (
                         precedent_activity
                         and abs(int(current_activity["viewOffset"] / 1000) - precedent_start) >= 15
                     )
@@ -84,10 +84,17 @@ def main():
                 precedent_start = 0
 
             time.sleep(5 if current_activity else 10)
-        except Exception as error:
-            LOGGER.error(f"Encountered an error : {error}")
         except PyPresenceException:
             reconnect_to_discord()
+        except SocketError as error:
+            if error.errno == 104:
+                LOGGER.error(f"❌ Connection reset by peer: {error}")
+                reconnect_to_discord()
+            else:
+                LOGGER.error(f"❌ Failed to connect to Discord: {error}")
+                reconnect_to_discord()
+        except Exception as error:
+            LOGGER.error(f"❌ Encountered an unexpected error : {error}")
 
 
 def reconnect_to_discord():
