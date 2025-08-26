@@ -46,13 +46,13 @@ def main():
             # print(json.dumps(current_activity, indent=2))
             if current_activity:
                 # Only update if there's a significant change in activity
-                should_update = (
+                should_update = not (
                     precedent_activity
                     and precedent_activity["title"] != current_activity["title"]
                     and precedent_activity["Player"]["state"] != current_activity["Player"]["state"]
                     and abs(int(current_activity["viewOffset"] / 1000) - precedent_start) >= 15
                 )
-
+                
                 if should_update:
                     to_send = get_corresponding_infos(current_activity=current_activity)
                     if (
@@ -81,7 +81,8 @@ def main():
                 precedent_start = 0
 
             time.sleep(5 if current_activity else 10)
-        except PyPresenceException:
+        except PyPresenceException as pypresence_error:
+            LOGGER.error(f"❌ Got a PyPresence error: {pypresence_error}")
             reconnect_to_discord()
         except SocketError as error:
             if error.errno == 104:
@@ -197,7 +198,7 @@ def parse_movie(current_activity: dict) -> dict:
     )
 
     to_send = dict(details=current_activity["title"])
-    to_send["state"] = current_activity["year"]
+    to_send["state"] = str(current_activity["year"])
     to_send["large_image"] = artwork if artwork else "movie"
     to_send["large_text"] = current_activity["title"][:50]
     to_send["activity_type"] = Activity.WATCHING.value

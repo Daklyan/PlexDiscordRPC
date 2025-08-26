@@ -77,9 +77,13 @@ Here's how the assets page looks with the repo images
 
 ![Assets page filled](./img/doc/assets_page.png)
 
-And how the RPC looks (here while listening to music for the example)
+And how the RPC looks
 
 ![RPC example](./img/doc/rpc_example.png)
+
+And the fallback version if it can't get media cover
+
+![RPC fallback example](./img/doc/rpc_fallback_example.png)
 
 ## Launching the script manually
 
