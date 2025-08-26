@@ -42,6 +42,7 @@ For discord to display your RPC you need to create an application on the dev por
 The process is very straight forward
 
 Just click on "New Application"
+
 ![New Application](./img/doc/create_app.png)
 
 Add an app name, accept the ToS and click create
@@ -53,11 +54,13 @@ After that you'll be on your newly created app page
 ### Setting up the discord app
 
 On your app page you'll find your discord app ID that you need to put in your config file for the script to work
+
 ![App id](./img/doc/app_id.png)
 
 That's all you need for your app to be functionnal
 
 But to make our RPC a bit prettier we're gonna add a few images on our app
+
 ![App assets](./img/doc/app_assets.png)
 
 You can use your own images or the ones in img/plex on this repo
@@ -77,13 +80,9 @@ Here's how the assets page looks with the repo images
 
 ![Assets page filled](./img/doc/assets_page.png)
 
-And how the RPC looks
+And how the RPC looks (here while listening to music for the example)
 
 ![RPC example](./img/doc/rpc_example.png)
-
-And the fallback version if it can't get media cover
-
-![RPC fallback example](./img/doc/rpc_fallback_example.png)
 
 ## Launching the script manually
 
@@ -106,6 +105,7 @@ python3 -X utf8 main.py
 ### Building and running the Docker Image
 
 ⚠️ Only works for linux atm as I mount the socket in the docker compose
+
 ⚠️ The path for the Discord socket might vary from a distro to another
 
 With docker compose
