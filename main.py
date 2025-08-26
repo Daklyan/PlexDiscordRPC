@@ -45,21 +45,18 @@ def main():
             current_activity = plex.get_my_activity()
             # print(json.dumps(current_activity, indent=2))
             if current_activity:
-                if precedent_activity:
-                    # Checking if user is scrubbing through media
-                    progress_diff = abs(
-                        int(current_activity["viewOffset"] / 1000) - precedent_start
+                # Only update if there's a significant change in activity
+                should_update = (
+                    not precedent_activity
+                    or precedent_activity["title"] != current_activity["title"]
+                    or precedent_activity["Player"]["state"] != current_activity["Player"]["state"]
+                    or (
+                        precedent_activity
+                        and abs(int(current_activity["viewOffset"] / 1000) - precedent_start) >= 15
                     )
-                if (
-                    precedent_activity
-                    and precedent_activity["title"] == precedent_activity["title"]
-                    and precedent_activity["Player"]["state"]
-                    == current_activity["Player"]["state"]
-                    and progress_diff < 15
-                ):
-                    # Not updating if same media or no scrubbing detected
-                    pass
-                else:
+                )
+
+                if should_update:
                     to_send = get_corresponding_infos(current_activity=current_activity)
                     if (
                         current_activity.get("grandparentTitle", "") != ""
@@ -78,12 +75,15 @@ def main():
                     )
                     RPC.update(**to_send)
 
-                time.sleep(5)
-
-                precedent_activity = current_activity
-                precedent_start = int(current_activity["viewOffset"] / 1000)
+                    # Update precedent activity
+                    precedent_activity = current_activity
+                    precedent_start = int(current_activity["viewOffset"] / 1000)
             else:
                 RPC.clear()
+                precedent_activity = {}
+                precedent_start = 0
+
+            time.sleep(5 if current_activity else 10)
         except Exception as error:
             LOGGER.error(f"Encountered an error : {error}")
         except PyPresenceException:
@@ -129,7 +129,7 @@ def get_corresponding_infos(current_activity: dict) -> dict:
         case "movie":
             to_send = parse_movie(current_activity)
         case "track":
-            to_send = parse_track(ccurrent_activity)
+            to_send = parse_track(current_activity)
         case _:
             to_send = dict(state=current_activity["title"])
             to_send["large_image"] = "plex"

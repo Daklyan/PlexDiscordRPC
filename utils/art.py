@@ -6,6 +6,7 @@ from config import tvdb_apikey, fanarttv_apikey
 from datetime import datetime
 
 from utils.logger import setup_logger
+from utils.cache import get_cached_data, set_cached_data
 
 TVDB_URL = "https://api4.thetvdb.com/v4"
 FANARTTV_URL = "https://webservice.fanart.tv/v3"
@@ -25,6 +26,11 @@ def get_artist_picture(artist_name: str) -> str | None:
     Returns:
         str: URL of the picture
     """
+    cache_key = f"artist_picture_{artist_name}"
+    cached_data = get_cached_data(cache_key)
+    if cached_data:
+        return cached_data
+
     LOGGER.debug(f"Fetching {artist_name} picture")
     try:
         id_url = f"{MBID_URL}/artist?query={artist_name}"
@@ -40,6 +46,8 @@ def get_artist_picture(artist_name: str) -> str | None:
             pic_url = data["artistthumb"][0]["url"]
         else:
             pic_url = data["artistbackground"][0]["url"]
+
+        set_cached_data(cache_key, pic_url)
     except requests.exceptions.RequestException as error:
         LOGGER.error(f"Error while fetching {artist_name} picture: {error}")
         return None
@@ -60,13 +68,19 @@ def get_item_cover(
     Returns:
         str: URL of the cover
     """
-    res_url = ""
-
     if media_type not in ["tv", "movies", "music"]:
         LOGGER.error(f"{media_type} is not a supported media type")
         return None
 
+    cache_key = f"cover_{media_type}_{media_name}_{year}_{media_artist}"
+    cached_data = get_cached_data(cache_key)
+    if cached_data:
+        return cached_data
+
     res_url = get_media_art(media_name, media_type, year, media_artist)
+
+    if res_url:
+        set_cached_data(cache_key, res_url)
 
     return res_url if res_url else None
 
