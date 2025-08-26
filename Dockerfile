@@ -5,7 +5,9 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+COPY main.py config.py requirements.txt /app
+COPY utils/ /app/utils/
+COPY patchedPypresence/ /app/patchedPypresence/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt

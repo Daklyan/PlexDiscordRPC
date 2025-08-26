@@ -1,6 +1,7 @@
 services:
   plex-discord-rpc:
-    image: plex-discord-rpc
+    build: .
+    # image: plex-discord-rpc
     container_name: plex-discord-rpc
     network_mode: host
     restart: unless-stopped
@@ -9,3 +10,4 @@ services:
     volumes:
       - /run/user/1000/discord-ipc-0:/tmp/discord-ipc-0:ro
       - ./plex_rpc.log:/app/plex_rpc.log
+      - ./config.json:/app/config.json

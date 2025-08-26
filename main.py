@@ -146,7 +146,7 @@ def parse_episode(current_activity: dict) -> dict:
 
     Args:
         current_activity (dict): Current activity provided by Plex
-        to_send (dict): nformations that'll be sent to discord RPC to set progression
+        to_send (dict): informations that'll be sent to discord RPC to set progression
 
     Returns:
         dict: Updated to_send dict with the parsed episode's info
@@ -178,7 +178,7 @@ def parse_movie(current_activity: dict) -> dict:
 
     Args:
         current_activity (dict): Current activity provided by Plex
-        to_send (dict): nformations that'll be sent to discord RPC to set progression
+        to_send (dict): informations that'll be sent to discord RPC to set progression
 
     Returns:
         dict: Updated to_send dict with the parsed movie's info
@@ -203,7 +203,7 @@ def parse_track(current_activity: dict) -> dict:
     """Parse infos for a track
     Args:
         current_activity (dict): Current activity provided by Plex
-        to_send (dict): nformations that'll be sent to discord RPC to set progression
+        to_send (dict): informations that'll be sent to discord RPC to set progression
 
     Returns:
         dict: Updated to_send dict with the parsed track's info
