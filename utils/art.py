@@ -57,7 +57,7 @@ def get_artist_picture(artist_name: str) -> str | None:
 
 
 def get_item_cover(
-    media_type: str, media_name=None, plex_item_id=None, year=None, media_artist=None
+    media_type: str, media_name=None, plex_item_id=None, media_artist=None
 ) -> str | None:
     """Gets an URL of a cover for a movie/show/album
 
@@ -73,12 +73,12 @@ def get_item_cover(
         LOGGER.error(f"❌ {media_type} is not a supported media type")
         return None
 
-    cache_key = f"cover_{media_type}_{media_name}_{plex_item_id}_{year}_{media_artist}"
+    cache_key = f"cover_{media_type}_{media_name}_{plex_item_id}_{media_artist}"
     cached_data = get_cached_data(cache_key)
     if cached_data:
         return cached_data
 
-    res_url = get_media_art(media_name, media_type, plex_item_id, year, media_artist)
+    res_url = get_media_art(media_name, media_type, plex_item_id, media_artist)
 
     if res_url:
         set_cached_data(cache_key, res_url)
@@ -101,7 +101,7 @@ def get_album_cover(mbid_id: str) -> str | None:
 
 
 def get_media_art(
-    media_name: str, media_type: str, plex_item_id=None, year=None, media_artist=None
+    media_name: str, media_type: str, plex_item_id=None, media_artist=None
 ) -> str | None:
     """Get the cover/poster for a media.
 
@@ -177,21 +177,6 @@ def wildcard_security(string: str) -> str:
         else:
             res += char
     return res
-
-
-def get_thumbnail(data: dict) -> str:
-    """Returns first thumbnail URL found
-
-    Args:
-        data (dict): Get thumbnail for a show episode or a movie
-
-    Returns:
-        str: URL of the thumbnail
-    """
-    for dict in data:
-        if dict.get("thumbnail"):
-            return dict["thumbnail"]
-    return ""
 
 
 def tvdb_login() -> str:
