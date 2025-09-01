@@ -3,6 +3,7 @@ import os
 import requests
 
 from config import tvdb_apikey, fanarttv_apikey
+from utils.plex import get_tvdb_id
 from datetime import datetime
 
 from utils.logger import setup_logger
@@ -56,7 +57,7 @@ def get_artist_picture(artist_name: str) -> str | None:
 
 
 def get_item_cover(
-    media_name: str, media_type: str, year=None, media_artist=None
+    media_type: str, media_name=None, plex_item_id=None, media_artist=None
 ) -> str | None:
     """Gets an URL of a cover for a movie/show/album
 
@@ -72,12 +73,12 @@ def get_item_cover(
         LOGGER.error(f"❌ {media_type} is not a supported media type")
         return None
 
-    cache_key = f"cover_{media_type}_{media_name}_{year}_{media_artist}"
+    cache_key = f"cover_{media_type}_{media_name}_{plex_item_id}_{media_artist}"
     cached_data = get_cached_data(cache_key)
     if cached_data:
         return cached_data
 
-    res_url = get_media_art(media_name, media_type, year, media_artist)
+    res_url = get_media_art(media_name, media_type, plex_item_id, media_artist)
 
     if res_url:
         set_cached_data(cache_key, res_url)
@@ -100,7 +101,7 @@ def get_album_cover(mbid_id: str) -> str | None:
 
 
 def get_media_art(
-    media_name: str, media_type: str, year=None, media_artist=None
+    media_name: str, media_type: str, plex_item_id=None, media_artist=None
 ) -> str | None:
     """Get the cover/poster for a media.
 
@@ -116,12 +117,15 @@ def get_media_art(
     url = None
     res_url = None
 
-    media_name = wildcard_security(media_name)
+    if media_name:
+        media_name = wildcard_security(media_name)
 
     if media_type == "tv":
-        url = f"{TVDB_URL}/search?q={media_name}&type=series"
+        tvdb_id = get_tvdb_id(plex_item_id)
+        url = f"{TVDB_URL}/series/{tvdb_id}"
     elif media_type == "movies":
-        url = f"{TVDB_URL}/search?q={media_name}&type=movie&year={year}"
+        tvdb_id = get_tvdb_id(plex_item_id)
+        url = f"{TVDB_URL}/movies/{tvdb_id}"
     elif media_type == "music":
         if media_artist:
             url = f"{MBID_URL}/release?query=artist:{media_artist}%20AND%20release:{media_name}"
@@ -138,7 +142,7 @@ def get_media_art(
         data = request.json()
 
         if media_type in ["tv", "movies"]:
-            res_url = get_thumbnail(data["data"])  # data["data"][0]["thumbnail"]
+            res_url = data["data"]["image"]
         elif media_type == "music":
             for release in data["releases"]:
                 if wildcard_security(
@@ -173,21 +177,6 @@ def wildcard_security(string: str) -> str:
         else:
             res += char
     return res
-
-
-def get_thumbnail(data: dict) -> str:
-    """Returns first thumbnail URL found
-
-    Args:
-        data (dict): Get thumbnail for a show episode or a movie
-
-    Returns:
-        str: URL of the thumbnail
-    """
-    for dict in data:
-        if dict.get("thumbnail"):
-            return dict["thumbnail"]
-    return ""
 
 
 def tvdb_login() -> str:

@@ -34,3 +34,22 @@ def get_my_activity(username=username, libraries=libraries):
             # print(json.dumps(stream, indent=4))
             return stream
     return None
+
+
+def get_metadata(plex_item_id=None) -> dict:
+    if plex_item_id:
+        headers = {"accept": "application/json"}
+        with urllib3.warnings.catch_warnings():
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            r = requests.get(
+                f"https://{plex_address}:{plex_port}/library/metadata/{plex_item_id}?X-Plex-Token={x_plex_token}",
+                headers=headers,
+                verify=False,
+            )
+            return json.loads(r.text)
+    return {}
+
+
+def get_tvdb_id(plex_item_id=None) -> str:
+    metadata = get_metadata(plex_item_id)
+    return metadata["MediaContainer"]["Metadata"][0]["Guid"][2]["id"].split("/")[-1]
