@@ -169,7 +169,7 @@ def parse_episode(current_activity: dict) -> dict:
     )
 
     artwork = get_item_cover(
-        media_name=current_activity["grandparentTitle"],
+        plex_item_id=current_activity["grandparentRatingKey"],
         media_type="tv",
     )
 
@@ -192,9 +192,8 @@ def parse_movie(current_activity: dict) -> dict:
         dict: Updated to_send dict with the parsed movie's info
     """
     artwork = get_item_cover(
-        media_name=current_activity["title"],
+        plex_item_id=current_activity["ratingKey"],
         media_type="movies",
-        year=current_activity["year"],
     )
 
     to_send = dict(details=current_activity["title"])
