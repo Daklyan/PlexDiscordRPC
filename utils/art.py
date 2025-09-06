@@ -3,7 +3,7 @@ import os
 import requests
 
 from config import tvdb_apikey, fanarttv_apikey
-from utils.plex import get_tvdb_id
+from utils.plex import get_imdb_id
 from datetime import datetime
 
 from utils.logger import setup_logger
@@ -116,12 +116,19 @@ def get_media_art(
     media_id = ""
     url = None
     res_url = None
+    headers = {
+            "accept": "application/json",
+            "Authorization": f"Bearer {tvdb_login()}",
+            "User-Agent": APP_HEADER,
+        }
 
     if media_name:
         media_name = wildcard_security(media_name)
 
     if media_type == "tv":
-        tvdb_id = get_tvdb_id(plex_item_id)
+        imdb_id = get_imdb_id(plex_item_id)
+        res = requests.get(url=f"{TVDB_URL}/search/remoteid/{imdb_id}", headers=headers)
+        tvdb_id = res.json()["data"][0]["series"]["id"]
         url = f"{TVDB_URL}/series/{tvdb_id}"
     elif media_type == "movies":
         tvdb_id = get_tvdb_id(plex_item_id)
@@ -132,11 +139,6 @@ def get_media_art(
         else:
             url = f"{MBID_URL}/release?query=release:{media_name}"
     try:
-        headers = {
-            "accept": "application/json",
-            "Authorization": f"Bearer {tvdb_login()}",
-            "User-Agent": APP_HEADER,
-        }
         encoded_url = requests.utils.requote_uri(url)
         request = requests.get(url=encoded_url, headers=headers)
         data = request.json()

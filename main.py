@@ -1,4 +1,5 @@
 import time
+import json
 import subprocess
 
 from config import client_id
@@ -43,16 +44,20 @@ def main():
     while True:
         try:
             current_activity = plex.get_my_activity()
-            # print(json.dumps(current_activity, indent=2))
+            #print(json.dumps(current_activity, indent=2))
             if current_activity:
                 # Only update if there's a significant change in activity
                 should_update = not (
                     precedent_activity
                     and precedent_activity["title"] == precedent_activity["title"]
-                    and precedent_activity["Player"]["state"] == current_activity["Player"]["state"]
-                    and abs(int(current_activity["viewOffset"] / 1000) - precedent_start) < 15
+                    and precedent_activity["Player"]["state"]
+                    == current_activity["Player"]["state"]
+                    and abs(
+                        int(current_activity["viewOffset"] / 1000) - precedent_start
+                    )
+                    < 15
                 )
-                
+
                 if should_update:
                     to_send = get_corresponding_infos(current_activity=current_activity)
                     if (

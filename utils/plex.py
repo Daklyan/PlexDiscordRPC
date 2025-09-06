@@ -50,6 +50,6 @@ def get_metadata(plex_item_id=None) -> dict:
     return {}
 
 
-def get_tvdb_id(plex_item_id=None) -> str:
+def get_imdb_id(plex_item_id=None) -> str:
     metadata = get_metadata(plex_item_id)
-    return metadata["MediaContainer"]["Metadata"][0]["Guid"][2]["id"].split("/")[-1]
+    return metadata["MediaContainer"]["Metadata"][0]["Guid"][0]["id"].split("/")[-1]
