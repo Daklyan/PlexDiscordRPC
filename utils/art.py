@@ -133,7 +133,7 @@ def get_media_art(
     elif media_type == "movies":
         imdb_id = get_imdb_id(plex_item_id)
         res = requests.get(url=f"{TVDB_URL}/search/remoteid/{imdb_id}", headers=headers)
-        tvdb_id = res.json()["data"][0]["series"]["id"]
+        tvdb_id = res.json()["data"][0]["movie"]["id"]
         url = f"{TVDB_URL}/movies/{tvdb_id}"
     elif media_type == "music":
         if media_artist:
